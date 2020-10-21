@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<style>
+
+		.autocomplete {
+		  position: relative;
+		  display: inline-block;
+		}
+		
+		
+		input[type=submit] {
+		  background-color: DodgerBlue;
+		  color: #fff;
+		  cursor: pointer;
+		}
+		
+		.autocomplete-items {
+		  position: absolute;
+		  border: 1px solid #d4d4d4;
+		  border-bottom: none;
+		  border-top: none;
+		  z-index: 99;
+		  top: 100%;
+		  left: 0;
+		  right: 0;
+		}
+		
+		.autocomplete-items div {
+		  padding: 10px;
+		  cursor: pointer;
+		  background-color: #fff; 
+		  border-bottom: 1px solid #d4d4d4; 
+		}
+		
+		.autocomplete-items div:hover {
+		  background-color: #e9e9e9; 
+		}
+		
+		.autocomplete-active {
+		  background-color: DodgerBlue !important; 
+		  color: #ffffff; 
+		}
+		</style>
+			
+	<link rel="stylesheet" href="{{ url_for('static',filename='css/plugins.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+	<link rel="stylesheet" href='http://fonts.googleapis.com/css?family=Dosis:400,700,500|Nunito:300,400,600' />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script>
+
+		function getMovieName(nm)
+		{
+		var movieId=document.getElementById("myInput");
+		nm=nm.charAt(0).toUpperCase()+nm.substr(1).toLowerCase();
+		movieId.value=nm;
+		getRecommendedMovies();
+		}
+
+		function getRecommendedMovies()
+		{
+		var firstUrl;
+		var movieDescription=document.getElementById("movieDescription");
+		var movieOtherStuffs=document.getElementById("movieOtherStuffs");
+		var name=document.getElementById("myInput").value;
+		let flag=false;
+		for(var n of movies)
+		{
+		if(n==name)
+		{
+		flag=true;
+	    break;
+		}
+		}
+       if(flag==false) 
+	   {
+		alert("Sorry movie you are looking is not in our database");
+		return;
+	   }
+
+        var query="https://api.themoviedb.org/3/search/movie?api_key=4cc7be89de1ac135b500af4bfd2eb8af&query="+name;
+	 $.ajax({
+    type:'GET',
+    url:query,
+    success: function(recs)
+	{
+	var a=JSON.stringify(recs);
+	//alert(a);
+	var rslt=JSON.parse(a);
+	var pp=rslt.results[0].poster_path;
+	document.getElementById("searchedImage").src="https://image.tmdb.org/t/p/w500"+pp;
+	var titleDiv=document.getElementById("titlediv");
+	titleDiv.innerHTML="";
+    let rating=rslt.results[0].vote_average;
+	titleDiv.innerHTML="<h6><a href='#'>"+name+"</a></h6>";
+	titleDiv.innerHTML=titleDiv.innerHTML+"<p><i class='ion-android-star'></i><span>"+rating+"</span> /10</p>";
+	movieDescription.innerHTML="";
+	let overview=rslt.results[0].overview;
+	movieDescription.innerHTML="<h2 style='color:yellow'>Overview 👇</h2>";
+	movieDescription.innerHTML+="<p><h6 style='color:white'>"+overview+"</h6></p>";
+	movieDescription.innerHTML+="<p><h4 style='color:#b3ffff'>Release Date : </h4><h5 style='color:white'>"+rslt.results[0].release_date+"</h5></p>";
+	movieDescription.innerHTML+="<p><h4 style='color:#b3ffff'>Vote Count : </h4><h5 style='color:white'>"+rslt.results[0].vote_count+"</h5></p>";
+    var movieId=rslt.results[0].id;
+	//cast code starts
+	$.ajax({
+    type:'GET',
+    url:"https://api.themoviedb.org/3/movie/"+movieId+"/casts?api_key=4cc7be89de1ac135b500af4bfd2eb8af",
+    success: function(castJSON)
+	{
+	var cast=document.getElementById("cast");
+	cast.innerHTML="";
+	cast.innerHTML+="<h4 class='sb-title'>Top Cast</h4>";
+	var castLength=castJSON.cast.length;
+	if(castLength>15) castLength=15;
+    for(var i=0;i<castLength;i++)
+	{
+	cast.innerHTML+="<div class='celeb-item'>";
+    cast.innerHTML+="<a><img src='https://image.tmdb.org/t/p/w500/"+castJSON.cast[i].profile_path+"' width='120' height='80'></a>";
+	cast.innerHTML+="<div class='celeb-author'>";
+	var lv=castJSON.cast[i].name;
+	lv=lv.replaceAll(" ","_");
+	lv=lv.replaceAll(".","");
+	var linkValue="https://en.wikipedia.org/wiki/"+lv;
+	cast.innerHTML+="<h6 style='color:white;'><a href="+linkValue+" style='cursor:pointer;'>"+castJSON.cast[i].name+"</a></h6>";
+	cast.innerHTML+="<span><h6 style='color:yellow'>Character : "+castJSON.cast[i].character+"</h6></span>";
+	cast.innerHTML+="</div>";
+	cast.innerHTML+="</div>";
+	}
+    },
+    error: function(){
+      //alert("error");
+    }
+  });
+
+//cating ends
+
+    },
+    error: function(){
+      //alert("error");
+    }
+  });
+
+
+
+		$.ajax({
+    type:'POST',
+    url:"/similarity",
+    data:{'name':name},
+    success: function(recs)
+	{
+
+		var movie_arr = recs.split('---');
+        var arr = [];
+        for(const movie in movie_arr){
+          arr.push(movie_arr[movie]);
+		}
+		
+	var stringToAppend="";
+    for(var i=0;i<arr.length;i++)
+	{
+	$.ajax({
+    type:'GET',
+	async:false,
+    url:"https://api.themoviedb.org/3/search/movie?api_key=4cc7be89de1ac135b500af4bfd2eb8af&query="+arr[i],
+    success: function(res)
+	{
+	if(i==0 || i==4 || i==8 || i==12)
+	{
+		stringToAppend+="<div class='row'>\n";
+        stringToAppend+="<div class='slick-multiItem'>\n";
+	}
+
+		stringToAppend+="<div class='slide-it'>\n";
+		stringToAppend+="<div class='movie-item'>\n";
+		stringToAppend+="<div class='mv-img'>\n";
+        firstUrl="https://image.tmdb.org/t/p/w500"+res.results[0].poster_path;
+        stringToAppend+="<img src='"+firstUrl+"' width='185' height='284'>\n";
+		stringToAppend+="</div>\n";
+		stringToAppend+="<div class='hvr-inner'>\n";
+		stringToAppend+="<a style='cursor:pointer;' onclick='getMovieName(`"+res.results[0].title+"`)'>Get Details<i class='ion-android-arrow-dropright'></i></a>";
+		stringToAppend+="</div>";			
+		stringToAppend+="<div class='title-in'>\n";
+		stringToAppend+="<h6><a href='#'>"+res.results[0].title+"</a></h6>\n";
+		stringToAppend+="<p><i class='ion-android-star'></i><span>"+res.results[0].vote_average+"</span> /10</p>\n";
+        stringToAppend+="</div></div></div>\n";
+		if(i==3 || i==7 || i==11 || i==15)
+		{
+		stringToAppend+="</div></div>\n";
+		}
+    },
+    error: function(){
+    }
+  });
+	  }
+	  document.getElementById("tab1").innerHTML="";
+	  document.getElementById("tab1").innerHTML=stringToAppend;
+     },
+    error: function(){
+      //alert("error");
+    }
+  });
+		
+	}
+		</script>
+</head>
+<body>
+
+<!-- BEGIN | Header -->
+<header class="ht-header">
+	<div class="container">
+		<nav class="navbar navbar-default navbar-custom">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header logo">
+				    <a href="#" style="color: red;text-shadow: 1px 1px red;font-size: 50px;"><h3>Movie Recommendation System</h3></a>
+				</div>
+				<div>
+				    <a href="https://github.com/saksham2105" style="padding-left: 750px;"><i style="font-size:50px;color:red;" class="fa fa-github"></i></a>
+			    </div>
+
+	    </nav>
+	    
+	    <!-- top search form -->
+	    <div class="top-search" style="width:800px;position:absolute;">
+			<input type="text" id="myInput" name="myCountry" placeholder="Search for a movie that you are looking for">
+			<button id="enterButton" type="button" class="btn btn-primary" style="height: 45px;" onclick="getRecommendedMovies()">Enter</button>
+		</div>
+
+			  </div>
+</header>
+<!-- END | Header -->
+
+<div class="slider movie-items">
+	<div class="container">
+		<div class="row">
+	    	<div  class="slick-multiItemSlider">
+	    		<div class="movie-item" >
+	    			<div class="mv-img">
+	    				<a href="#"><img id="searchedImage" name="searchedImage" alt="" width="285" height="437"></a>
+	    			</div>
+	    			<div class="title-in" id="titlediv">
+	    			</div>
+				</div>
+				
+
+				<div class="movie-item" id="movieDescription">
+	    		</div>
+
+			</div>
+
+	    </div>
+	</div>
+</div>
+<div class="movie-items">
+	<div class="container">
+		<div class="row ipad-width">
+			<div class="col-md-6">
+				<div class="title-hd">
+					<h2>Recommended Movies</h2>
+				</div>
+				<div class="tabs">
+				    <div class="tab-content">
+				        <div id="tab1" name="tab1" class="tab active">
+
+
+                        </div>
+				    </div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="sidebar">
+					<div class="celebrities" id="cast">
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--end of latest new v1 section-->
+<!-- footer section-->
+<footer class="ht-footer">
+	<div class="container">
+	</div>
+	<div class="ft-copyright">
+		<div class="backtotop">
+			<center>
+			<p><a href="#" id="back-to-top" style="color: red;">Back to top  <i class="ion-ios-arrow-thin-up"></i></a></p>
+			<p><h5 style="color: azure;">&copy; Developed by Saksham Solanki</h5></p>
+			</center>
+		</div>
+	</div>
+</footer>
+<!-- end of footer section-->
+<script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
+<script src="{{ url_for('static',filename='js/plugins.js') }}"></script>
+<script src="{{ url_for('static',filename='js/plugins2.js') }}"></script>
+<script src="{{ url_for('static',filename='js/custom.js') }}"></script>
+<script>
+	function autocomplete(inp, arr) {
+  var currentFocus;
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      this.parentNode.appendChild(a);
+      for (i = 0; i < arr.length; i++) {
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          b = document.createElement("DIV");
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          b.addEventListener("click", function(e) {
+              inp.value = this.getElementsByTagName("input")[0].value;
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  inp.addEventListener("keydown", function(e) {
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        currentFocus++;
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        currentFocus--;
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        e.preventDefault();
+        if (currentFocus > -1) {
+          if (x) x[currentFocus].click();
+        }
+      }
+  });
+  function addActive(x) {
+    if (!x) return false;
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+  document.addEventListener("click", function (e) {
+      closeAllLists(e.target);
+  });
+}
+var movies={{movies|tojson}};
+autocomplete(document.getElementById("myInput"), movies);
+
+</script>	  
+
+</body>
+
+
+</html>
