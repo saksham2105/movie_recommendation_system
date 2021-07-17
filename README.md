@@ -1,9 +1,9 @@
 # Flask Based Movie recommendation system
 > https://moviercmdsystem.herokuapp.com
 
-![GitHub stars](https://img.shields.io/github/stars/rajaprerak/movie_recommender) 
-[![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/rajaprerak/movie_recommender/commits/master)
-[![Website shields.io](https://img.shields.io/badge/website-up-yellow)](https://moviercmdsystem.herokuapp.com/)
+![GitHub stars](https://img.shields.io/github/stars/saksham2105/movie_recommendation_system) 
+[![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/saksham2105/movie_recommendation_system/commits/master)
+[![Website shields.io](https://img.shields.io/badge/website-up-yellow)]()
 
 ### Website Preview
 #### Home Page
