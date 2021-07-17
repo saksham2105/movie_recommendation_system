@@ -1,10 +1,9 @@
-# Django based movie recommender system
+# Flask Based Movie recommendation system
 > https://moviercmdsystem.herokuapp.com
 
 ![GitHub stars](https://img.shields.io/github/stars/rajaprerak/movie_recommender) 
 [![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/rajaprerak/movie_recommender/commits/master)
-[![Website shields.io](https://img.shields.io/badge/website-up-yellow)](https://awesome-movie-recommender.herokuapp.com/)
-[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
+[![Website shields.io](https://img.shields.io/badge/website-up-yellow)](https://moviercmdsystem.herokuapp.com/)
 
 ### Website Preview
 #### Home Page
@@ -26,17 +25,15 @@
 #### Run server locally
 
 ```shell
-$ python manage.py runserver
+$ python app.py
 ```
-> Go to localhost:8000
+> Go to localhost:portNumber
 
 ---
 ## Features 📋
-* User can register and login.
+* User can Search and get results on each key Press.
 * User can search through various movies and look through its details.
-* User can give rating to the movies.
-* User can add movie to their watch list.
-* User can get movie recommendation (Recommendation algorithm (Collaborative Filtering) which suggests new movies based on the ratings given by user.)
+* User will get movies based on searching genre,cast,rating of movie etc. (Recommendation algorithm (Collaborative Filtering) which suggests new movies based on conditions mentioned.)
 ---
 
 ## Algorithm
