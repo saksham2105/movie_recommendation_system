@@ -7,10 +7,11 @@
 
 ### Website Preview
 #### Home Page
-<img src="mrs-2.png" width="900">
+### Video Preview
+[![IMAGE ALT TEXT HERE](mrs-2.png)](https://www.youtube.com/watch?v=OT_nsAMnlz4)
 
 #### Detail Page
-<img src="mrs-1.png" width="900">
+[![IMAGE ALT TEXT HERE](mrs-1.png)](https://www.youtube.com/watch?v=OT_nsAMnlz4)
 
 ----
 
