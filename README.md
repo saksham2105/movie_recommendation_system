@@ -45,4 +45,7 @@ $ python app.py
     * **User-based**, which measures the similarity between target users and other users.
     * **Item-based**, which measures the similarity between the items that target users rate or interact with and other items.
     > I have used **user based** collaborative filtering in this project.
-     
+ 
+ ## Tools and Technologies Used 
+![](https://img.shields.io/badge/Python3.8-%3C%2F%3E-blueviolet) ![](https://img.shields.io/badge/Scipy-%3C%2F%3E-yellow) ![](https://img.shields.io/badge/Pandas-%3C%2F%3E-yellow) ![](https://img.shields.io/badge/Flask-%3C%2F%3E-yellow)
+
