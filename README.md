@@ -7,7 +7,7 @@
 
 ### Website Preview
 #### Home Page
-### Video Preview
+### Video Preview(Click on below image to see video)
 [![IMAGE ALT TEXT HERE](mrs-2.png)](https://www.youtube.com/watch?v=OT_nsAMnlz4)
 
 #### Detail Page
